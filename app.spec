@@ -1,13 +1,41 @@
 # -*- mode: python ; coding: utf-8 -*-
+from PyInstaller.utils.hooks import collect_all
+
+datas = []
+binaries = []
+hiddenimports = []
+
+# 收集 selenium 相关的所有依赖
+selenium_ret = collect_all('selenium')
+datas += selenium_ret[0]; binaries += selenium_ret[1]; hiddenimports += selenium_ret[2]
+
+# 收集 webdriver_manager 相关的所有依赖
+webdriver_ret = collect_all('webdriver_manager')
+datas += webdriver_ret[0]; binaries += webdriver_ret[1]; hiddenimports += webdriver_ret[2]
 
 block_cipher = None
 
 a = Analysis(
-    ['main.py'],  # 你的主程序文件
+    ['main.py'],  # 你的主程序文件名
     pathex=[],
-    binaries=[],
-    datas=[],     # 如果有其他资源文件，在这里添加
-    hiddenimports=['PyQt5.sip'],  # PyQt5需要的隐藏导入
+    binaries=binaries,
+    datas=datas,
+    hiddenimports=hiddenimports + [
+        'selenium',
+        'selenium.webdriver',
+        'selenium.webdriver.edge.service',
+        'selenium.webdriver.edge.options',
+        'selenium.webdriver.edge.webdriver',
+        'selenium.webdriver.common.by',
+        'selenium.webdriver.common.keys',
+        'selenium.webdriver.support.ui',
+        'selenium.webdriver.support.expected_conditions',
+        'webdriver_manager',
+        'webdriver_manager.microsoft',
+        'PyQt5',
+        'PyQt5.sip',
+        'requests',
+    ],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -38,10 +66,10 @@ exe = EXE(
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=False,  # False表示不显示控制台窗口
+    console=True,  # True以显示控制台窗口，方便查看错误信息
     disable_windowed_traceback=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='app.ico',  # 如果有图标文件，在这里指定
+    # icon='app.ico',  # 如果有图标，取消注释这行
 )
